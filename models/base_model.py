@@ -1,44 +1,46 @@
 #!/usr/bin/python3
 """Base model of the console"""
 import uuid
-from datetime import datetime
+from datetime import datetime as d
 import json
+
 
 class BaseModel:
     """Base Model"""
-    
+
     def __init__(self, *args, **kwargs):
         """Instantion method"""
         if len(kwargs) != 0:
             """Create instance"""
-            for key, value in kwargs.items():
+            for key, val in kwargs.items():
                 if key == '__class__':
                     setattr(self, key, type(self))
                 elif key == 'created_at' or key == 'updated_at':
                     """Formats datetime"""
-                    setattr(self, key, datetime.strptime(value,  "%Y-%m-%dT%H:%M:%S.%f"))
+                    setattr(self, key, d.strptime(val, "%Y-%m-%dT%H:%M:%S.%f"))
                 else:
-                    setattr(self, key, value)
+                    setattr(self, key, val)
         else:
             """No dict create new instance"""
             self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
+            self.created_at = d.now()
             self.updated_at = self.created_at
             from models.__init__ import storage
             storage.new(self)
-    
+
     def __str__(self):
         """Overriding __str__ method"""
-        retstr = "[{}] ({}) {}".format(self.__class__.__name__, self.id, self.__dict__)
-        return retstr
+        return (
+                "[{}] ({}) {}".format(self.__class__.__name__,
+                self.id, self.__dict__))
 
     def save(self):
         """Updates updated at attribute"""
-        now = datetime.now()
+        now = d.now()
         self.updated_at = now
         from models.__init__ import storage
         storage.save()
-    
+
     def to_dict(self):
         """Returns dictionary instance attributes"""
         attributes = {}
