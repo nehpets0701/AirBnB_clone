@@ -51,3 +51,4 @@ class BaseModel:
                 attributes[key] = value
         attributes['__class__'] = type(self).__name__
         return attributes
+
