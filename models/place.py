@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """place data"""
-
+from base_model import BaseModel
 
 class Place(BaseModel):
     """place data"""
