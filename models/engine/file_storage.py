@@ -4,19 +4,20 @@
 import json
 from models.base_model import BaseModel
 
+
 class FileStorage:
     """File storage engine"""
     __file_path = "file.json"
     __objects = {}
-    
+
     def all(self):
         """Returns dict __objects"""
         return self.__objects
-    
+
     def new(self, obj):
         """adds object to object dict with id key"""
         self.__objects[str(type(obj).__name__) + "." + obj.id] = obj
-        
+
     def save(self):
         """Serializes objects to json file"""
         thangs = []
@@ -24,7 +25,7 @@ class FileStorage:
             thangs.append(value.to_dict())
         with open(self.__file_path, "w+") as f:
             f.write(json.dumps(thangs))
-    
+
     def reload(self):
         """Deserializes json file back into objects {} dict"""
         try:
@@ -33,5 +34,5 @@ class FileStorage:
             for obj in leest:
                 if obj['__class__'] == "BaseModel":
                     self.new(BaseModel(**obj))
-        except:
+        except Exception:
             pass
