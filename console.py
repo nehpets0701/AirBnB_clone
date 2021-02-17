@@ -110,8 +110,6 @@ class HBNBCommand(cmd.Cmd):
                     storage.save()
             else:
                 print("** no instance found **")
-        else:
-            print("** class doesn't exist **")
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
