@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """main console class with cmd module"""
 import cmd
+import shlex
 from models import storage
 from models.base_model import BaseModel
 from models.amenity import Amenity
@@ -21,6 +22,10 @@ class HBNBCommand(cmd.Cmd):
 
     def do_quit(self, args):
         """quit function"""
+        raise SystemExit
+
+    def do_EOF(self, args):
+        """EOF function"""
         raise SystemExit
 
     def emptyline(self):
@@ -47,7 +52,7 @@ class HBNBCommand(cmd.Cmd):
             print("** instance id missing **")
         elif strList[0] in classes:
             iid = "{}.{}".format(strList[0], strList[1])
-            dicti = storage.all()
+            dicti = storage.all().to_dict()
             if iid in dicti.keys():
                 print(dicti[iid])
             else:
@@ -71,43 +76,38 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, args):
         """prints string representation for all instances"""
         strList = args.split()
-        output = []
         if (len(strList) == 0):
-            for a in storage.all():
-                output.append(str(storage.all()[a]))
-            print(output)
+            print(storage.all())
         elif (len(strList) == 1 and strList[0] in classes):
-            for a in storage.all():
-                word = a.split(".")
-                if word[0] == strList[0]:
-                    output.append(str(storage.all()[a]))
-            print(output)
+            print(storage.all())
+            for x in storage.all():
+                for y in x:
+                    print(y)
         else:
             print("** class doesn't exist **")
 
     def do_update(self, args):
         """updates an instance"""
-        strList = args.split()
+        strList = shlex.split(args)
         if (len(strList) == 0):
             print("** class name missing **")
-        elif (len(strList) == 1):
+        elif len(strList) == 1:
             print("** instance id missing **")
         elif len(strList) == 2:
             print("** attribute name missing **")
         elif len(strList) == 3:
             print("** value missing **")
-        elif strList[0] in classes:
+        else:
             iid = "{}.{}".format(strList[0], strList[1])
             dicti = storage.all()
             if iid in dicti.keys():
                 idict = dicti[iid]
-                if strList[2] in storage.all()[iid].to_dict().keys():
-                    setattr(storage.all()[iid], strList[2],
-                            type(getattr(storage.all()[iid], strList[2]))(strList[3]))
-                    storage.all()[iid].save()
+                if strList[2] in idict.keys() and strList[2]:
+                    idict[strList[2]] = strList[3]
+                    storage.save()
                 else:
-                    setattr(storage.all()[iid], strList[2], strList[3])
-                    storage.all()[iid].save()
+                    idict[strList[2]] = strList[3]
+                    storage.save()
             else:
                 print("** no instance found **")
         else:
