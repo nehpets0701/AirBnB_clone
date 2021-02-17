@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """main console class with cmd module"""
 import cmd
+import shlex
 from models import storage
 from models.base_model import BaseModel
 from models.amenity import Amenity
@@ -21,6 +22,10 @@ class HBNBCommand(cmd.Cmd):
 
     def do_quit(self, args):
         """quit function"""
+        raise SystemExit
+
+    def do_EOF(self, args):
+        """EOF function"""
         raise SystemExit
 
     def emptyline(self):
@@ -83,16 +88,16 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, args):
         """updates an instance"""
-        strList = args.split()
+        strList = shlex.split(args)
         if (len(strList) == 0):
             print("** class name missing **")
-        elif (len(strList) == 1):
+        elif len(strList) == 1:
             print("** instance id missing **")
         elif len(strList) == 2:
             print("** attribute name missing **")
         elif len(strList) == 3:
             print("** value missing **")
-        elif strList[0] in classes:
+        else:
             iid = "{}.{}".format(strList[0], strList[1])
             dicti = storage.all()
             if iid in dicti.keys():
