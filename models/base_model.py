@@ -31,8 +31,8 @@ class BaseModel:
     def __str__(self):
         """Overriding __str__ method"""
         return (
-                "[{}] ({}) {}".format(self.__class__.__name__,
-                self.id, self.__dict__))
+                "[{}] ({}) {}".format(self.__class__.__name__, self.id,
+                                      self.__dict__))
 
     def save(self):
         """Updates updated at attribute"""
@@ -51,4 +51,3 @@ class BaseModel:
                 attributes[key] = value
         attributes['__class__'] = type(self).__name__
         return attributes
-
