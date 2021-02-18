@@ -47,11 +47,13 @@ class HBNBCommand(cmd.Cmd):
         strList = args.split()
         if (len(strList) == 0):
             print("** class name missing **")
+        elif strList[0] not in classes:
+            print("** class doesn't exist **")
         elif (len(strList) == 1):
             print("** instance id missing **")
-        elif strList[0] in classes:
+        else:
             iid = "{}.{}".format(strList[0], strList[1])
-            dicti = storage.all().to_dict()
+            dicti = storage.all()
             if iid in dicti.keys():
                 print(dicti[iid])
             else:
@@ -64,7 +66,9 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
         elif (len(strList) == 1):
             print("** instance id missing **")
-        elif strList[0] in classes:
+        elif strList[0] not in classes:
+            print("** class doesn't exist **")
+        else:
             iid = "{}.{}".format(strList[0], strList[1])
             dicti = storage.all()
             if iid in dicti.keys():
@@ -75,19 +79,24 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, args):
         """prints string representation for all instances"""
         strList = args.split()
+        new = []
         if (len(strList) == 0):
-            print(storage.all())
-        elif (len(strList) == 1 and strList[0] in classes):
-            print(storage.all())
             for x in storage.all():
-                for y in x:
-                    print(y)
+                new.append(str(storage.all()[x]))
+            print(new)
+        elif strList[0] in classes:
+            for x in storage.all():
+                num = x.split(".")
+                if num[0] == strList[0]:
+                    new.append(str(storage.all()[x]))
+            print(new)
         else:
             print("** class doesn't exist **")
 
     def do_update(self, args):
         """updates an instance"""
         strList = shlex.split(args)
+        flag = 0
         if (len(strList) == 0):
             print("** class name missing **")
         elif len(strList) == 1:
@@ -96,18 +105,16 @@ class HBNBCommand(cmd.Cmd):
             print("** attribute name missing **")
         elif len(strList) == 3:
             print("** value missing **")
+        elif strList[0] not in classes:
+            print("** class doesn't exist **")
         else:
             iid = "{}.{}".format(strList[0], strList[1])
-            dicti = storage.all()
-            if iid in dicti.keys():
-                idict = dicti[iid]
-                if strList[2] in idict.keys() and strList[2]:
-                    idict[strList[2]] = strList[3]
-                    storage.save()
-                else:
-                    idict[strList[2]] = strList[3]
-                    storage.save()
-            else:
+            for key, value in storage.all().items():
+                if key == iid:
+                    setattr(value, strList[2], str(strList[3]))
+                    value.save()
+                    flag = 1
+            if flag == 0:
                 print("** no instance found **")
 
 if __name__ == "__main__":
