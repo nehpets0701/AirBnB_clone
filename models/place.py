@@ -2,7 +2,6 @@
 """place data"""
 from models.base_model import BaseModel
 
-
 class Place(BaseModel):
     """place data"""
     city_id = ""

@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """main console class with cmd module"""
 import cmd
-import shlex
 from models import storage
 from models.base_model import BaseModel
 from models.amenity import Amenity
@@ -10,6 +9,7 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
+from models.base_model import BaseModel
 
 classes = {"BaseModel": BaseModel, "State": State, "City": City,
            "Amenity": Amenity, "Place": Place, "Review": Review, "User": User}
@@ -21,10 +21,6 @@ class HBNBCommand(cmd.Cmd):
 
     def do_quit(self, args):
         """quit function"""
-        raise SystemExit
-
-    def do_EOF(self, args):
-        """EOF function"""
         raise SystemExit
 
     def emptyline(self):
@@ -47,11 +43,9 @@ class HBNBCommand(cmd.Cmd):
         strList = args.split()
         if (len(strList) == 0):
             print("** class name missing **")
-        elif strList[0] not in classes:
-            print("** class doesn't exist **")
         elif (len(strList) == 1):
             print("** instance id missing **")
-        else:
+        elif strList[0] in classes:
             iid = "{}.{}".format(strList[0], strList[1])
             dicti = storage.all()
             if iid in dicti.keys():
@@ -66,9 +60,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
         elif (len(strList) == 1):
             print("** instance id missing **")
-        elif strList[0] not in classes:
-            print("** class doesn't exist **")
-        else:
+        elif strList[0] in classes:
             iid = "{}.{}".format(strList[0], strList[1])
             dicti = storage.all()
             if iid in dicti.keys():
@@ -79,43 +71,47 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, args):
         """prints string representation for all instances"""
         strList = args.split()
-        new = []
+        output = []
         if (len(strList) == 0):
-            for x in storage.all():
-                new.append(str(storage.all()[x]))
-            print(new)
-        elif strList[0] in classes:
-            for x in storage.all():
-                num = x.split(".")
-                if num[0] == strList[0]:
-                    new.append(str(storage.all()[x]))
-            print(new)
+            for a in storage.all():
+                output.append(str(storage.all()[a]))
+            print(output)
+        elif (len(strList) == 1 and strList[0] in classes):
+            for a in storage.all():
+                word = a.split(".")
+                if word[0] == strList[0]:
+                    output.append(str(storage.all()[a]))
+            print(output)
         else:
             print("** class doesn't exist **")
 
     def do_update(self, args):
         """updates an instance"""
-        strList = shlex.split(args)
-        flag = 0
+        strList = args.split()
         if (len(strList) == 0):
             print("** class name missing **")
-        elif len(strList) == 1:
+        elif (len(strList) == 1):
             print("** instance id missing **")
         elif len(strList) == 2:
             print("** attribute name missing **")
         elif len(strList) == 3:
             print("** value missing **")
-        elif strList[0] not in classes:
-            print("** class doesn't exist **")
-        else:
+        elif strList[0] in classes:
             iid = "{}.{}".format(strList[0], strList[1])
-            for key, value in storage.all().items():
-                if key == iid:
-                    setattr(value, strList[2], str(strList[3]))
-                    value.save()
-                    flag = 1
-            if flag == 0:
+            dicti = storage.all()
+            if iid in dicti.keys():
+                idict = dicti[iid]
+                if strList[2] in storage.all()[iid].to_dict().keys():
+                    setattr(storage.all()[iid], strList[2],
+                            type(getattr(storage.all()[iid], strList[2]))(strList[3]))
+                    storage.all()[iid].save()
+                else:
+                    setattr(storage.all()[iid], strList[2], strList[3])
+                    storage.all()[iid].save()
+            else:
                 print("** no instance found **")
+        else:
+            print("** class doesn't exist **")
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()

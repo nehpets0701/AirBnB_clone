@@ -2,7 +2,6 @@
 """review data"""
 from models.base_model import BaseModel
 
-
 class Review(BaseModel):
     """review data"""
     text = ""
